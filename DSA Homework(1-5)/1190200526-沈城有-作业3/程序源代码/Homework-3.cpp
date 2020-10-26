@@ -1,5 +1,5 @@
 /*
-* 作业3 树形结构及其应用
+* 作业3 树型结构及其应用
 * 学号：1190200526
 * 姓名：沈城有
 */
@@ -9,8 +9,8 @@
 #include <malloc.h>
 using namespace std;
 #define elemtype char
-#define maxlength 200 //栈及队列的元素个数限制
-#define maxheight 8   //最高二叉树高度
+#define maxlength 200
+#define maxheight 8  //最高二叉树高度
 
 //二叉树的二叉链表存储结构
 struct BT_Node
@@ -25,7 +25,7 @@ typedef BT_Node* BTree;
 struct stack
 {
 	BTree elements[maxlength];
-	int visit[maxlength] = { 0 };     //访问
+	int visit[maxlength] = { 0 };     //记录结点访问
 	int top;
 };
 typedef struct stack Stack;
