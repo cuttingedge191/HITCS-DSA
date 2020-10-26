@@ -9,8 +9,8 @@
 #include <malloc.h>
 using namespace std;
 #define elemtype char
-#define maxlength 200
-#define maxheight 8  //最高二叉树高度
+#define maxlength 200 //栈及队列元素限制
+#define maxheight 8   //最大二叉树高度
 
 //二叉树的二叉链表存储结构
 struct BT_Node
