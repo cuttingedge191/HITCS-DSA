@@ -1,9 +1,9 @@
 /*
-* ÊµÑé2 Ê÷ĞÍ½á¹¹¼°ÆäÓ¦ÓÃ£¨Ë¼¿¼²¿·Ö£©
-* ÊµÑéÏîÄ¿£ºÊ÷ĞÎ½á¹¹¼°ÆäÓ¦ÓÃ
-* ÊµÑéÌâÄ¿£º¹ş·òÂü±àÂëÓëÒëÂë·½·¨
-* Ñ§ºÅ£º1190200526
-* ĞÕÃû£ºÉò³ÇÓĞ
+* å®éªŒ2 æ ‘å‹ç»“æ„åŠå…¶åº”ç”¨ï¼ˆæ€è€ƒéƒ¨åˆ†ï¼‰
+* å®éªŒé¡¹ç›®ï¼šæ ‘å½¢ç»“æ„åŠå…¶åº”ç”¨
+* å®éªŒé¢˜ç›®ï¼šå“ˆå¤«æ›¼ç¼–ç ä¸è¯‘ç æ–¹æ³•
+* å­¦å·ï¼š1190200526
+* å§“åï¼šæ²ˆåŸæœ‰
 */
 
 #include <iostream>
@@ -12,34 +12,34 @@
 #include <map>
 #include <string>
 using namespace std;
-#define InputDir "Input.txt"      //Ó¢ÎÄÎÄ±¾Â·¾¶
-#define N 256                     //×î´óÒ¶×ÓÊı£¨×Ö·ûÖÖÀàÊı£©
-#define Max_K 32                  //×î´ókÖµ
-#define M Max_K * N - 1           //×î´ó½áµã×ÜÊı
+#define InputDir "Input.txt"      //è‹±æ–‡æ–‡æœ¬è·¯å¾„
+#define N 256                     //æœ€å¤§å¶å­æ•°ï¼ˆå­—ç¬¦ç§ç±»æ•°ï¼‰
+#define Max_K 32                  //æœ€å¤§kå€¼
+#define M Max_K * N - 1           //æœ€å¤§ç»“ç‚¹æ€»æ•°
 
-//×î´ó¶ÑÊı¾İ½á¹¹ÊµÏÖ
+//æœ€å°å †æ•°æ®ç»“æ„å®ç°
 typedef struct heap
 {
-	int data[M + 1][2];  //±àºÅ+ÆµÂÊ
+	int data[M + 1][2];  //ç¼–å·+é¢‘ç‡
 	int n;
 }Heap;
 
-//K²æÊ÷º¢×ÓÁ´±í
+//Kå‰æ ‘å­©å­é“¾è¡¨
 typedef struct childnode
 {
 	int child;
 	childnode* next;
 }HTC;
 
-//K²æ¹ş·òÂüÊ÷½á¹¹¶¨Òå
+//Kå‰å“ˆå¤«æ›¼æ ‘ç»“æ„å®šä¹‰
 typedef struct K_htnode
 {
 	int parent;
 	int freq;
-	HTC head;  //º¢×ÓÁ´±í±íÍ·
+	HTC head;  //å­©å­é“¾è¡¨è¡¨å¤´
 }HTNode;
 
-//×Ö·û±àÂë±í
+//å­—ç¬¦ç¼–ç è¡¨
 typedef struct codingtablec
 {
 	int num;
@@ -47,7 +47,7 @@ typedef struct codingtablec
 	string code;
 }CodeTab_C;
 
-//µ¥´Ê±àÂë±í
+//å•è¯ç¼–ç è¡¨
 typedef struct codingtables
 {
 	int num;
@@ -55,21 +55,21 @@ typedef struct codingtables
 	string ch;
 }CodeTab_S;
 
-//Êı¾İ½á¹¹Ïà¹Ø»ù±¾²Ù×÷ÉùÃ÷
+//æ•°æ®ç»“æ„ç›¸å…³åŸºæœ¬æ“ä½œå£°æ˜
 void InitHeap(Heap& heap);
 bool HeapEmpty(Heap heap);
 bool HeapFull(Heap heap);
 void HeapInsert(Heap& heap, int num, int freq);
 void HeapDeleteMin(Heap& heap, int& num);
-//¹¦ÄÜÊµÏÖÏà¹Øº¯ÊıÉùÃ÷
-int ReadFromFile(char ch);                             //´ÓÎÄ¼şÖĞ¶ÁÈ¡²¢Í³¼ÆĞÅÏ¢
-void CreateHeap(char ch, Heap& heap);                  //´´½¨³õÊ¼¶Ñ
-HTC* HTCNodeInit(int k);                               //³õÊ¼»¯K²æÊ÷º¢×ÓÁ´±í          
-int HTNodeInit(char ch);                               //ÓÃÍ³¼ÆÊı¾İ³õÊ¼»¯Éú³É½áµã
-void SelectMin(Heap& heap, int k, int num[]);          //Ñ¡È¡k¸ö×îĞ¡È¨Öµ£¨ÀûÓÃ¶Ñ£©
-void CreateHT(Heap heap, char ch);                     //¹¹Ôì¹ş·òÂüÊ÷
-void ProcessCodeTable(char ch);                        //¸ù¾İ¹ş·òÂüÊ÷Éú³É²¢±£´æ±àÂë±í
-void ShowInfo(char ch);                                //ÏÔÊ¾Í³¼ÆĞÅÏ¢¼°±àÂë±í
+//åŠŸèƒ½å®ç°ç›¸å…³å‡½æ•°å£°æ˜
+int ReadFromFile(char ch);                             //ä»æ–‡ä»¶ä¸­è¯»å–å¹¶ç»Ÿè®¡ä¿¡æ¯
+void CreateHeap(char ch, Heap& heap);                  //åˆ›å»ºåˆå§‹å †
+HTC* HTCNodeInit(int k);                               //åˆå§‹åŒ–Kå‰æ ‘å­©å­é“¾è¡¨          
+int HTNodeInit(char ch);                               //ç”¨ç»Ÿè®¡æ•°æ®åˆå§‹åŒ–ç”Ÿæˆç»“ç‚¹
+void SelectMin(Heap& heap, int k, int num[]);          //é€‰å–kä¸ªæœ€å°æƒå€¼ï¼ˆåˆ©ç”¨å †ï¼‰
+void CreateHT(Heap heap, char ch);                     //æ„é€ å“ˆå¤«æ›¼æ ‘
+void ProcessCodeTable(char ch);                        //æ ¹æ®å“ˆå¤«æ›¼æ ‘ç”Ÿæˆå¹¶ä¿å­˜ç¼–ç è¡¨
+void ShowInfo(char ch);                                //æ˜¾ç¤ºç»Ÿè®¡ä¿¡æ¯åŠç¼–ç è¡¨
 
 void InitHeap(Heap& heap)
 {
@@ -133,13 +133,13 @@ void HeapDeleteMin(Heap& heap, int& num)
 	heap.data[parent][1] = temp[1];
 }
 
-HTNode HTree[M];           //K²æ¹ş·òÂüÊ÷
-map<char, int> resultc;    //Í³¼Æ×Ö·ûÓÃ
-map<string, int> results;  //Í³¼Æµ¥´ÊÓÃ
-CodeTab_C CT_C[N];         //´æ´¢×Ö·û±àÂë±í
-CodeTab_S CT_S[N];         //´æ´¢µ¥´Ê±àÂë±í
+HTNode HTree[M];           //Kå‰å“ˆå¤«æ›¼æ ‘
+map<char, int> resultc;    //ç»Ÿè®¡å­—ç¬¦ç”¨
+map<string, int> results;  //ç»Ÿè®¡å•è¯ç”¨
+CodeTab_C CT_C[N];         //å­˜å‚¨å­—ç¬¦ç¼–ç è¡¨
+CodeTab_S CT_S[N];         //å­˜å‚¨å•è¯ç¼–ç è¡¨
 
-//´ÓÎÄ¼şÖĞ¶ÁÈ¡²¢Í³¼ÆĞÅÏ¢
+//ä»æ–‡ä»¶ä¸­è¯»å–å¹¶ç»Ÿè®¡ä¿¡æ¯
 int ReadFromFile(char ch)
 {
 	ifstream OpenFile(InputDir);
@@ -156,7 +156,7 @@ int ReadFromFile(char ch)
 		while (OpenFile.get(temp))
 		{
 			if (temp == '\n')
-				temp = '#';  //×ª»»»»ĞĞ·û±ãÓÚÏÔÊ¾
+				temp = '#';  //è½¬æ¢æ¢è¡Œç¬¦ä¾¿äºæ˜¾ç¤º
 			it = resultc.find(temp);
 			if (it != resultc.end())
 				++it->second;
@@ -197,10 +197,10 @@ int ReadFromFile(char ch)
 		OpenFile.close();
 		cout << "File read and analysis completed." << endl;
 		return countt;
-	}*/  //µ¥´Ê²¿·Ö
+	}*/  //å•è¯éƒ¨åˆ†
 }
 
-//´´½¨³õÊ¼¶Ñ
+//åˆ›å»ºåˆå§‹å †
 void CreateHeap(char ch, Heap& heap)
 {
 	if (ch == '1')
@@ -225,12 +225,12 @@ void CreateHeap(char ch, Heap& heap)
 	}
 }
 
-//³õÊ¼»¯K²æÊ÷º¢×ÓÁ´±í
+//åˆå§‹åŒ–Kå‰æ ‘å­©å­é“¾è¡¨
 HTC* HTCNodeInit(int k)
 {
 	HTC* pcur;
 	HTC* q;
-	q = (HTC*)malloc(sizeof(HTC));  //¼ÇÂ¼µÚÒ»¸ö½áµã
+	q = (HTC*)malloc(sizeof(HTC));  //è®°å½•ç¬¬ä¸€ä¸ªç»“ç‚¹
 	if (q == NULL)
 	{
 		cout << "Memory allocation failed!" << endl;
@@ -253,7 +253,7 @@ HTC* HTCNodeInit(int k)
 	return q;
 }
 
-//ÓÃÍ³¼ÆÊı¾İ³õÊ¼»¯Éú³É½áµã
+//ç”¨ç»Ÿè®¡æ•°æ®åˆå§‹åŒ–ç”Ÿæˆç»“ç‚¹
 int HTNodeInit(char ch)
 {
 	int k;
@@ -285,14 +285,14 @@ int HTNodeInit(char ch)
 	return k;
 }
 
-//Ñ¡È¡k¸ö×îĞ¡È¨Öµ£¨ÀûÓÃ¶Ñ£©
+//é€‰å–kä¸ªæœ€å°æƒå€¼ï¼ˆåˆ©ç”¨å †ï¼‰
 void SelectMin(Heap& heap, int k, int num[])
 {
 	for (int i = 0; i < k; ++i)
 		HeapDeleteMin(heap, num[i]);
 }
 
-//¹¹Ôì¹ş·òÂüÊ÷
+//æ„é€ å“ˆå¤«æ›¼æ ‘
 void CreateHT(Heap heap, char ch)
 {
 	int i, a, b;
@@ -340,19 +340,19 @@ void CreateHT(Heap heap, char ch)
 	}
 }
 
-//sortËùĞè±È½Ïº¯Êı1
+//sortæ‰€éœ€æ¯”è¾ƒå‡½æ•°1
 bool cmp_1(CodeTab_C a, CodeTab_C b)
 {
 	return HTree[a.num].freq > HTree[b.num].freq;
 }
 
-//sortËùĞè±È½Ïº¯Êı2
+//sortæ‰€éœ€æ¯”è¾ƒå‡½æ•°2
 bool cmp_2(CodeTab_S a, CodeTab_S b)
 {
 	return HTree[a.num].freq > HTree[b.num].freq;
 }
 
-//¸ù¾İ¹ş·òÂüÊ÷Éú³É²¢±£´æ±àÂë±í
+//æ ¹æ®å“ˆå¤«æ›¼æ ‘ç”Ÿæˆå¹¶ä¿å­˜ç¼–ç è¡¨
 void ProcessCodeTable(char ch)
 {
 	int c, p, i;
@@ -386,7 +386,7 @@ void ProcessCodeTable(char ch)
 				else
 					code[--start] = 'A' + count - 10;
 				count = -1;
-				c = p;  //¼ÌĞøÉÏËİ;
+				c = p;  //ç»§ç»­ä¸Šæº¯;
 			}
 			for (int j = start; j < 99; ++j)
 			{
@@ -401,7 +401,7 @@ void ProcessCodeTable(char ch)
 	}
 }
 
-//ÏÔÊ¾Í³¼ÆĞÅÏ¢
+//æ˜¾ç¤ºç»Ÿè®¡ä¿¡æ¯
 void ShowInfo(char ch)
 {
 	if (ch == '1')
