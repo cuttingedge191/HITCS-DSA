@@ -1,9 +1,9 @@
 /*
-* å®éªŒ2 æ ‘å‹ç»“æ„åŠå…¶åº”ç”¨ï¼ˆæ€è€ƒéƒ¨åˆ†ï¼‰
-* å®éªŒé¡¹ç›®ï¼šæ ‘å½¢ç»“æ„åŠå…¶åº”ç”¨
-* å®éªŒé¢˜ç›®ï¼šå“ˆå¤«æ›¼ç¼–ç ä¸è¯‘ç æ–¹æ³•
-* å­¦å·ï¼š1190200526
-* å§“åï¼šæ²ˆåŸæœ‰
+* ÊµÑé2 Ê÷ĞÍ½á¹¹¼°ÆäÓ¦ÓÃ£¨Ë¼¿¼²¿·Ö£©
+* ÊµÑéÏîÄ¿£ºÊ÷ĞÎ½á¹¹¼°ÆäÓ¦ÓÃ
+* ÊµÑéÌâÄ¿£º¹ş·òÂü±àÂëÓëÒëÂë·½·¨
+* Ñ§ºÅ£º1190200526
+* ĞÕÃû£ºÉò³ÇÓĞ
 */
 
 #include <iostream>
@@ -11,35 +11,37 @@
 #include <algorithm>
 #include <map>
 #include <string>
+#include <cmath>
 using namespace std;
-#define InputDir "Input.txt"      //è‹±æ–‡æ–‡æœ¬è·¯å¾„
-#define N 256                     //æœ€å¤§å¶å­æ•°ï¼ˆå­—ç¬¦ç§ç±»æ•°ï¼‰
-#define Max_K 32                  //æœ€å¤§kå€¼
-#define M Max_K * N - 1           //æœ€å¤§ç»“ç‚¹æ€»æ•°
+#define InputDir "Input.txt"      //Ó¢ÎÄÎÄ±¾Â·¾¶
+#define CompDir "Comp.ht"         //±àÂëÎÄ±¾±£´æÂ·¾¶
+#define N 256                     //×î´óÒ¶×ÓÊı£¨×Ö·ûÖÖÀàÊı£©
+#define Max_K 32                  //×î´ókÖµ
+#define M Max_K * N - 1           //×î´ó½áµã×ÜÊı
 
-//æœ€å°å †æ•°æ®ç»“æ„å®ç°
+//×îĞ¡¶ÑÊı¾İ½á¹¹ÊµÏÖ
 typedef struct heap
 {
-	int data[M + 1][2];  //ç¼–å·+é¢‘ç‡
+	int data[M + 1][2];  //±àºÅ+ÆµÂÊ
 	int n;
 }Heap;
 
-//Kå‰æ ‘å­©å­é“¾è¡¨
+//K²æÊ÷º¢×ÓÁ´±í
 typedef struct childnode
 {
 	int child;
 	childnode* next;
 }HTC;
 
-//Kå‰å“ˆå¤«æ›¼æ ‘ç»“æ„å®šä¹‰
+//K²æ¹ş·òÂüÊ÷½á¹¹¶¨Òå
 typedef struct K_htnode
 {
 	int parent;
 	int freq;
-	HTC head;  //å­©å­é“¾è¡¨è¡¨å¤´
+	HTC head;  //º¢×ÓÁ´±í±íÍ·
 }HTNode;
 
-//å­—ç¬¦ç¼–ç è¡¨
+//×Ö·û±àÂë±í
 typedef struct codingtablec
 {
 	int num;
@@ -47,7 +49,7 @@ typedef struct codingtablec
 	string code;
 }CodeTab_C;
 
-//å•è¯ç¼–ç è¡¨
+//µ¥´Ê±àÂë±í
 typedef struct codingtables
 {
 	int num;
@@ -55,21 +57,23 @@ typedef struct codingtables
 	string ch;
 }CodeTab_S;
 
-//æ•°æ®ç»“æ„ç›¸å…³åŸºæœ¬æ“ä½œå£°æ˜
+//Êı¾İ½á¹¹Ïà¹Ø»ù±¾²Ù×÷ÉùÃ÷
 void InitHeap(Heap& heap);
 bool HeapEmpty(Heap heap);
 bool HeapFull(Heap heap);
 void HeapInsert(Heap& heap, int num, int freq);
 void HeapDeleteMin(Heap& heap, int& num);
-//åŠŸèƒ½å®ç°ç›¸å…³å‡½æ•°å£°æ˜
-int ReadFromFile(char ch);                             //ä»æ–‡ä»¶ä¸­è¯»å–å¹¶ç»Ÿè®¡ä¿¡æ¯
-void CreateHeap(char ch, Heap& heap);                  //åˆ›å»ºåˆå§‹å †
-HTC* HTCNodeInit(int k);                               //åˆå§‹åŒ–Kå‰æ ‘å­©å­é“¾è¡¨          
-int HTNodeInit(char ch);                               //ç”¨ç»Ÿè®¡æ•°æ®åˆå§‹åŒ–ç”Ÿæˆç»“ç‚¹
-void SelectMin(Heap& heap, int k, int num[]);          //é€‰å–kä¸ªæœ€å°æƒå€¼ï¼ˆåˆ©ç”¨å †ï¼‰
-void CreateHT(Heap heap, char ch);                     //æ„é€ å“ˆå¤«æ›¼æ ‘
-void ProcessCodeTable(char ch);                        //æ ¹æ®å“ˆå¤«æ›¼æ ‘ç”Ÿæˆå¹¶ä¿å­˜ç¼–ç è¡¨
-void ShowInfo(char ch);                                //æ˜¾ç¤ºç»Ÿè®¡ä¿¡æ¯åŠç¼–ç è¡¨
+//¹¦ÄÜÊµÏÖÏà¹Øº¯ÊıÉùÃ÷
+int ReadFromFile(char ch);                             //´ÓÎÄ¼şÖĞ¶ÁÈ¡²¢Í³¼ÆĞÅÏ¢
+void CreateHeap(char ch, Heap& heap);                  //´´½¨³õÊ¼¶Ñ
+HTC* HTCNodeInit(int k);                               //³õÊ¼»¯K²æÊ÷º¢×ÓÁ´±í          
+int HTNodeInit(char ch);                               //ÓÃÍ³¼ÆÊı¾İ³õÊ¼»¯Éú³É½áµã
+void SelectMin(Heap& heap, int k, int num[]);          //Ñ¡È¡k¸ö×îĞ¡È¨Öµ£¨ÀûÓÃ¶Ñ£©
+void CreateHT(Heap heap, char ch, int& k);             //¹¹Ôì¹ş·òÂüÊ÷
+void ProcessCodeTable(char ch);                        //¸ù¾İ¹ş·òÂüÊ÷Éú³É²¢±£´æ±àÂë±í
+void ShowInfo(char ch);                                //ÏÔÊ¾Í³¼ÆĞÅÏ¢¼°±àÂë±í
+void EncodeFile(void);                                 //¸ù¾İ±àÂëÉú³ÉÑ¹ËõÎÄ¼ş
+void CalculateRate(int countt, int k);                 //¼ÆËãÑ¹ËõÂÊ
 
 void InitHeap(Heap& heap)
 {
@@ -133,13 +137,13 @@ void HeapDeleteMin(Heap& heap, int& num)
 	heap.data[parent][1] = temp[1];
 }
 
-HTNode HTree[M];           //Kå‰å“ˆå¤«æ›¼æ ‘
-map<char, int> resultc;    //ç»Ÿè®¡å­—ç¬¦ç”¨
-map<string, int> results;  //ç»Ÿè®¡å•è¯ç”¨
-CodeTab_C CT_C[N];         //å­˜å‚¨å­—ç¬¦ç¼–ç è¡¨
-CodeTab_S CT_S[N];         //å­˜å‚¨å•è¯ç¼–ç è¡¨
+HTNode HTree[M];           //K²æ¹ş·òÂüÊ÷
+map<char, int> resultc;    //Í³¼Æ×Ö·ûÓÃ
+map<string, int> results;  //Í³¼Æµ¥´ÊÓÃ
+CodeTab_C CT_C[N];         //´æ´¢×Ö·û±àÂë±í
+CodeTab_S CT_S[N];         //´æ´¢µ¥´Ê±àÂë±í
 
-//ä»æ–‡ä»¶ä¸­è¯»å–å¹¶ç»Ÿè®¡ä¿¡æ¯
+//´ÓÎÄ¼şÖĞ¶ÁÈ¡²¢Í³¼ÆĞÅÏ¢
 int ReadFromFile(char ch)
 {
 	ifstream OpenFile(InputDir);
@@ -156,7 +160,7 @@ int ReadFromFile(char ch)
 		while (OpenFile.get(temp))
 		{
 			if (temp == '\n')
-				temp = '#';  //è½¬æ¢æ¢è¡Œç¬¦ä¾¿äºæ˜¾ç¤º
+				temp = '#';  //×ª»»»»ĞĞ·û±ãÓÚÏÔÊ¾
 			it = resultc.find(temp);
 			if (it != resultc.end())
 				++it->second;
@@ -197,10 +201,10 @@ int ReadFromFile(char ch)
 		OpenFile.close();
 		cout << "File read and analysis completed." << endl;
 		return countt;
-	}*/  //å•è¯éƒ¨åˆ†
+	}*/  //µ¥´Ê²¿·Ö
 }
 
-//åˆ›å»ºåˆå§‹å †
+//´´½¨³õÊ¼¶Ñ
 void CreateHeap(char ch, Heap& heap)
 {
 	if (ch == '1')
@@ -225,12 +229,12 @@ void CreateHeap(char ch, Heap& heap)
 	}
 }
 
-//åˆå§‹åŒ–Kå‰æ ‘å­©å­é“¾è¡¨
+//³õÊ¼»¯K²æÊ÷º¢×ÓÁ´±í
 HTC* HTCNodeInit(int k)
 {
 	HTC* pcur;
 	HTC* q;
-	q = (HTC*)malloc(sizeof(HTC));  //è®°å½•ç¬¬ä¸€ä¸ªç»“ç‚¹
+	q = (HTC*)malloc(sizeof(HTC));  //¼ÇÂ¼µÚÒ»¸ö½áµã
 	if (q == NULL)
 	{
 		cout << "Memory allocation failed!" << endl;
@@ -253,7 +257,7 @@ HTC* HTCNodeInit(int k)
 	return q;
 }
 
-//ç”¨ç»Ÿè®¡æ•°æ®åˆå§‹åŒ–ç”Ÿæˆç»“ç‚¹
+//ÓÃÍ³¼ÆÊı¾İ³õÊ¼»¯Éú³É½áµã
 int HTNodeInit(char ch)
 {
 	int k;
@@ -285,19 +289,18 @@ int HTNodeInit(char ch)
 	return k;
 }
 
-//é€‰å–kä¸ªæœ€å°æƒå€¼ï¼ˆåˆ©ç”¨å †ï¼‰
+//Ñ¡È¡k¸ö×îĞ¡È¨Öµ£¨ÀûÓÃ¶Ñ£©
 void SelectMin(Heap& heap, int k, int num[])
 {
 	for (int i = 0; i < k; ++i)
 		HeapDeleteMin(heap, num[i]);
 }
 
-//æ„é€ å“ˆå¤«æ›¼æ ‘
-void CreateHT(Heap heap, char ch)
+//¹¹Ôì¹ş·òÂüÊ÷
+void CreateHT(Heap heap, char ch, int& k)
 {
-	int i, a, b;
+	int i, a;
 	int p[Max_K];
-	int k;
 	HTC* pcur;
 	if (ch == '1')
 	{
@@ -305,7 +308,12 @@ void CreateHT(Heap heap, char ch)
 		k = HTNodeInit(ch);
 		CreateHeap(ch, heap);
 		i = maxn;
-		while(heap.n >= k)
+		if ((maxn - 1) % (k - 1))  //²¹³ä¼¸¸öÎŞÒâÒåµÄµãÒÔ±£Ö¤Ã¿´Î¶¼ÄÜÈ¡k¸ö
+		{
+			for (int m = 1; m <= (k - 1) - (maxn - 1) % (k - 1); ++m)
+				HeapInsert(heap, -1, 0);
+		}
+		while(heap.n > 1)
 		{
 			SelectMin(heap, k, p);
 			for (a = 0; a < k; ++a)
@@ -318,21 +326,6 @@ void CreateHT(Heap heap, char ch)
 				pcur->child = p[a++];
 			++i;
 		}
-		if (heap.n)
-		{
-			b = heap.n;
-			for (int n = 1; n <= k - b; ++n)
-				HeapInsert(heap, -1, 0);
-			SelectMin(heap, k, p);
-			for (a = 0; a < k; ++a)
-			{
-				HTree[p[a]].parent = i;
-				HTree[i].freq += HTree[p[a]].freq;
-			}
-			HeapInsert(heap, i, HTree[i].freq);
-			for (pcur = HTree[i].head.next, a = 0; pcur != NULL; pcur = pcur->next)
-				pcur->child = p[a++];
-		}
 	}
 	else
 	{
@@ -340,19 +333,19 @@ void CreateHT(Heap heap, char ch)
 	}
 }
 
-//sortæ‰€éœ€æ¯”è¾ƒå‡½æ•°1
+//sortËùĞè±È½Ïº¯Êı1
 bool cmp_1(CodeTab_C a, CodeTab_C b)
 {
 	return HTree[a.num].freq > HTree[b.num].freq;
 }
 
-//sortæ‰€éœ€æ¯”è¾ƒå‡½æ•°2
+//sortËùĞè±È½Ïº¯Êı2
 bool cmp_2(CodeTab_S a, CodeTab_S b)
 {
 	return HTree[a.num].freq > HTree[b.num].freq;
 }
 
-//æ ¹æ®å“ˆå¤«æ›¼æ ‘ç”Ÿæˆå¹¶ä¿å­˜ç¼–ç è¡¨
+//¸ù¾İ¹ş·òÂüÊ÷Éú³É²¢±£´æ±àÂë±í
 void ProcessCodeTable(char ch)
 {
 	int c, p, i;
@@ -386,7 +379,7 @@ void ProcessCodeTable(char ch)
 				else
 					code[--start] = 'A' + count - 10;
 				count = -1;
-				c = p;  //ç»§ç»­ä¸Šæº¯;
+				c = p;  //¼ÌĞøÉÏËİ;
 			}
 			for (int j = start; j < 99; ++j)
 			{
@@ -401,7 +394,7 @@ void ProcessCodeTable(char ch)
 	}
 }
 
-//æ˜¾ç¤ºç»Ÿè®¡ä¿¡æ¯
+//ÏÔÊ¾Í³¼ÆĞÅÏ¢
 void ShowInfo(char ch)
 {
 	if (ch == '1')
@@ -423,25 +416,78 @@ void ShowInfo(char ch)
 	}
 }
 
+//¸ù¾İ±àÂëÉú³ÉÑ¹ËõÎÄ¼ş
+void EncodeFile(void)
+{
+	ifstream ReadFile;
+	ofstream WriteFile;
+	char temp;
+	int q;
+	int count = 0;
+	ReadFile.open(InputDir);
+	WriteFile.open(CompDir);
+	string::iterator it;
+	map<char, double>::iterator mt;
+	if (!ReadFile || !WriteFile)
+	{
+		cout << "File open failed!" << endl;
+		return;
+	}
+	while (ReadFile.get(temp))
+	{
+		if (temp == '\n')
+			temp = '#';   //×ª»»»»ĞĞ·û
+		for (q = 0; q < (int)resultc.size(); ++q)
+		{
+			if (CT_C[q].ch == temp)
+				break;
+		}
+		WriteFile << CT_C[q].code;
+	}
+	ReadFile.close();
+	WriteFile.close();
+	cout << "File encode completed." << endl;
+}
+
+//¼ÆËãÑ¹ËõÂÊ
+void CalculateRate(int countt, int k)
+{
+	double rate;
+	int count = 0;
+	int encode = ceil(log2(1.0 * k));
+	map<char, int>::iterator it;
+	string::iterator its;
+	for (unsigned int i = 0; i < resultc.size(); ++i)
+	{
+		it = resultc.find(CT_C[i].ch);
+		count += encode * it->second * CT_C[i].code.size();
+	}
+	rate = (double)count / 8 / (double)countt * 100;
+	cout << "Encode rate:" << rate << "%" << endl;
+}
+
 int main(void)
 {
-	int countt;
-	char ch;
+	int countt, k;
+	char ch = '1';
 	Heap heap;
 	InitHeap(heap);
-	cout << "[1] Character\t[2] Word" << endl;
+	/*cout << "[1] Character\t[2] Word" << endl;
 	cout << "Input choice:";
-	cin >> ch;
+	cin >> ch;*/
 	countt = ReadFromFile(ch);
 	if (!countt)
 	{
 		cout << "Illegal operation or empty file!" << endl;
 		return 0;
 	}
-	CreateHT(heap, ch);
+	CreateHT(heap, ch, k);
 	ProcessCodeTable(ch);
 	ShowInfo(ch);
 	cout << "Total characters:" << countt << endl;
+	system("pause");
+	EncodeFile();
+	CalculateRate(countt, k);
 	system("pause");
 	return 0;
 }

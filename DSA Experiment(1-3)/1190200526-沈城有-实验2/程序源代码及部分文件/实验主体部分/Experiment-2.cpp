@@ -45,16 +45,16 @@ void SelectMin(int n, int& p1, int& p2);                       //Ñ¡È¡Á½¸ö×îĞ¡È¨Ö
 void CreateHT(void);                                           //¹¹Ôì¹ş·òÂüÊ÷
 bool cmp(CodeTab a, CodeTab b);                                //sortËùĞè±È½Ïº¯Êı
 void PrintCodingTable(void);                                   //ÆÁÄ»ÏÔÊ¾±àÂë±í
-bool CompressFile(void);                                       //¸ù¾İ±àÂëÉú³ÉÑ¹ËõÎÄ¼ş
-void CalculateRate(void);                                      //¼ÆËãÑ¹ËõÂÊ
+int CompressFile(void);                                        //¸ù¾İ±àÂëÉú³ÉÑ¹ËõÎÄ¼ş
+void CalculateRate(int counts, int countt);                    //¼ÆËãÑ¹ËõÂÊ
 bool DecompressFile(void);                                     //Ñ¹ËõÎÄ¼ş½âÂë
 
 //´ÓÎÄ¼şÖĞ¶ÁÈ¡²¢Í³¼ÆĞÅÏ¢
 int ReadFromFile(void)
 {
 	ifstream OpenFile(InputDir);
-	map<char, int> data;
-	map<char, int>::iterator it;
+	map<char, int> data;         //Í³¼Æ×Ö·û¼°ÆµÂÊ
+	map<char, int>::iterator it; //²éÕÒ×Ö·ûËùÓÃµü´úÆ÷
 	char temp;
 	int countt = 0;
 	double rate;
@@ -126,7 +126,7 @@ void HTNodeInit(void)
 
 //Ñ¡È¡Á½¸ö×îĞ¡È¨Öµ
 void SelectMin(int n, int& p1, int& p2)
-{
+{//¼òµ¥±éÀúÊµÏÖ°æ
 	int i, j;
 	for (i = 0; i < n; ++i)
 	{
@@ -192,7 +192,7 @@ void PrintCodingTable(void)
 		CT[i].ch = it->first;
 		CT[i].num = i;
 	}
-	sort(CT, CT + max, cmp);
+	sort(CT, CT + max, cmp);  //°´ÆµÂÊ½µĞòÅÅĞò
 	for (i = 0; i < max; ++i)
 	{
 		c = CT[i].num;
@@ -219,7 +219,7 @@ void PrintCodingTable(void)
 }
 
 //¸ù¾İ±àÂëÉú³ÉÑ¹ËõÎÄ¼ş
-bool CompressFile(void)
+int CompressFile(void)
 {
 	ifstream ReadFile;
 	ofstream WriteFile;
@@ -227,6 +227,7 @@ bool CompressFile(void)
 	char bin = 0;       //ÓÃÀ´´¢´æµ±Ç°µÄhuffman±àÂë
 	int i = 0;          //¼ÇÂ¼´¦ÀíÎ»Êı£¨µ½8¾ÍĞ´Ò»´Î£©
 	int q;
+	int count = 0;
 	ReadFile.open(InputDir);
 	WriteFile.open(CompDir, ios::binary);
 	string::iterator it;
@@ -234,7 +235,7 @@ bool CompressFile(void)
 	if (!ReadFile || !WriteFile)
 	{
 		cout << "File open failed!" << endl;
-		return false;
+		return 0;
 	}
 	//Ê×ÏÈĞ´Èë±àÂë±íµÈ½âÑ¹ËõËùĞèĞÅÏ¢
 	WriteFile << result.size();  //×Ö·ûÖÖÀàÊı
@@ -251,6 +252,7 @@ bool CompressFile(void)
 			if (CT[q].ch == temp)
 				break;
 		}
+		count += CT[q].code.size();
 		for(it = CT[q].code.begin(); it != CT[q].code.end(); ++it)
 		{//01´®×ª¶ş½øÖÆ´¦Àí
 			if (*it == '0')
@@ -273,24 +275,27 @@ bool CompressFile(void)
 	WriteFile.close();
 	result.clear();
 	cout << "File compression completed." << endl;
-	return true;
+	return count;
 }
 
 //¼ÆËãÑ¹ËõÂÊ
-void CalculateRate(void)
+void CalculateRate(int counts, int countt)
 {
 	double TextSize;
 	double ZipSize;
-	double rate;
+	double crate;
+	double srate;
 	struct _stat textinfo, zipinfo;
 	_stat(InputDir, &textinfo);
 	_stat(CompDir, &zipinfo);
 	TextSize = textinfo.st_size;
 	ZipSize = zipinfo.st_size;
-	rate = ZipSize / TextSize * 100;
+	crate = ZipSize / TextSize * 100;
+	srate = (double)counts / 8 / countt * 100;
 	cout << "The size of original file:" << TextSize << endl;
 	cout << "The size of compressed file:" << ZipSize << endl;
-	cout << "compression rate:" << rate << "%" << endl;
+	cout << "Compress rate:" << crate << "%" << endl;           //ÕæÊµÎÄ¼şÑ¹ËõÂÊ
+	cout << "Encode rate:" << srate << "%" << endl;             //±àÂëÂÊ
 }
 
 //Ñ¹ËõÎÄ¼ş½âÂë
@@ -390,7 +395,8 @@ bool DecompressFile(void)
 
 int main(void)
 {
-	int countt;
+	int countt;  //¼ÇÂ¼×Ö·û×ÜÊı
+	int counts;  //¼ÇÂ¼Ñ¹Ëõºó³¤¶È
 	char ch;
 	cout << "------------------------------Huffman File Process------------------------------" << endl;
 	cout << "[1] File Compress\n" << "[2] File Decompress" << endl;
@@ -412,12 +418,13 @@ int main(void)
 		PrintCodingTable();
 		cout << endl;
 		system("pause");
-		if (!CompressFile())
+		counts = CompressFile();
+		if (!counts)
 		{
 			cout << "Error:File compress failed!" << endl;
 			return 0;
 		}
-		CalculateRate();
+		CalculateRate(counts, countt);
 		system("pause");
 	}
 	else if (ch == '2')
