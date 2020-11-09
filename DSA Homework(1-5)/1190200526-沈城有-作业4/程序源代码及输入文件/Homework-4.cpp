@@ -65,18 +65,6 @@ void BFS_AM(AdjMatrix* adjm, int i, int& count);       //ÔÚÓĞÏòÍ¼ÁÚ½Ó¾ØÕóÉÏÒ»´Î¹
 void BFS_AG_Main(AdjGraph* adjg);                      //ÔÚÓĞÏòÍ¼ÁÚ½Ó±íÉÏ¹ãËÑÖ÷Ëã·¨
 void BFS_AG(AdjGraph* adjg, int i, int& count);        //ÔÚÓĞÏòÍ¼ÁÚ½Ó±íÉÏÒ»´Î¹ãËÑËã·¨
 
-/*
-* [Á½ÖÖ½¨Á¢Ëã·¨µÄÊ±¼ä¸´ÔÓ¶ÈÒÔ¼°´æ´¢½á¹¹µÄ¿Õ¼äÕ¼ÓÃÇé¿ö·ÖÎö]
-* ÓĞÏòÍ¼ÁÚ½Ó¾ØÕó£º
-*	Ê±¼ä¸´ÔÓ¶È£ºT = O(n^2 + n + e)£¬ÓÉe <= n^2µÃT = O(n^2)£»
-*	¿Õ¼äÕ¼ÓÃ£ºO(n^2)£»
-*	ÊÊÓÃÓÚ³íÃÜÍ¼¡£
-* ÓĞÏòÍ¼ÁÚ½Ó±í£º
-*	Ê±¼ä¸´ÔÓ¶È£ºT = O(n + e)£»
-*	¿Õ¼äÕ¼ÓÃ£ºO(n + e)£»
-*	ÊÊÓÃÓÚÏ¡ÊèÍ¼¡£
-*/
-
 //´´½¨ÓÃÁÚ½Ó¾ØÕó±íÊ¾µÄÓĞÏòÍ¼
 AdjMatrix* CreateAdjM(void)
 {
@@ -350,7 +338,6 @@ void DFS_NR_AM_Main(AdjMatrix* adjm)
 void DFS_NR_AM(AdjMatrix* adjm, int i, int& count)
 {
 	stack<int> s;
-	int temp = i;
 	s.push(i);
 	cout << adjm->vertex[s.top()] << " ";
 	Visited[i] = true;
@@ -359,7 +346,7 @@ void DFS_NR_AM(AdjMatrix* adjm, int i, int& count)
 	{
 		if (j == adjm->n)
 		{
-			if (temp == s.top())
+			if (s.empty())
 				break;
 			i = s.top();
 			s.pop();
@@ -372,7 +359,7 @@ void DFS_NR_AM(AdjMatrix* adjm, int i, int& count)
 			s.push(j);
 			cout << adjm->vertex[j] << " ";
 			i = j;
-			j = 0;
+			j = -1;  //ÕâÀïĞèÒªÊÇ-1·ñÔò»á¶ªÊ§ÓëµÚÒ»¸ö¶¥µãµÄ±ß
 		}
 		++j;
 	}
@@ -427,13 +414,18 @@ void DFS_NR_AG(AdjGraph* adjg, int i, int& count)
 				cout << adjg->VexList[p->adjvex].vertex << " ";
 				Visited[p->adjvex] = true;
 				fn[p->adjvex] = count++;
+				if (adjg->VexList[p->adjvex].firstedge)
+					p = adjg->VexList[p->adjvex].firstedge;
+				else
+					p = p->next;
 			}
-			p = p->next;
+			else
+				p = p->next;
 		}
+		if (s.empty())
+			break;
 		i = s.top();
 		s.pop();
-		if (i == temp)
-			break;
 	}
 }
 
