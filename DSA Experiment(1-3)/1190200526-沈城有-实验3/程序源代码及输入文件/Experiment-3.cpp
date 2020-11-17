@@ -13,7 +13,7 @@ using namespace std;
 #define Max_N 50
 #define VertexData char         //顶点数据类型
 #define EdgeData int            //边数据类型
-#define Inf 1e8
+#define Inf 1e8                 //无穷大定义
 #define InputDir "Input.txt"    //文件输入路径
 
 //邻接矩阵数据结构
@@ -166,7 +166,12 @@ void Dijkstra(AdjMatrix* adjm, MinHeap& heap, int start, bool S[], int pre[], in
 			break;
 		HeapDeleteMin(heap, min);
 		if (S[min])
-			break;
+		{
+			if (HeapEmpty(heap))
+				break;
+			else
+				HeapDeleteMin(heap, min);
+		}
 		S[min] = true;
 		for (int i = 0; i < adjm->n; ++i)
 		{
@@ -255,7 +260,12 @@ void Single_Target(AdjMatrix* adjm, MinHeap& heap, bool S[], int pre[], int dis[
 			break;
 		HeapDeleteMin(heap, min);
 		if (S[min])
-			break;
+		{
+			if (HeapEmpty(heap))
+				break;
+			else
+				HeapDeleteMin(heap, min);
+		}
 		S[min] = true;
 		for (int i = 0; i < adjm->n; ++i)
 		{
@@ -300,8 +310,13 @@ void Single_Vertex_Pair(AdjMatrix* adjm, MinHeap& heap, bool S[], int pre[], int
 		if (HeapEmpty(heap))
 			break;
 		HeapDeleteMin(heap, min);
-		if (S[min] || min == t)
-			break;
+		if (S[min])
+		{
+			if (HeapEmpty(heap) || min == t)
+				break;
+			else
+				HeapDeleteMin(heap, min);
+		}
 		S[min] = true;
 		for (int i = 0; i < adjm->n; ++i)
 		{
