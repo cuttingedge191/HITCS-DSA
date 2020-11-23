@@ -14,110 +14,54 @@ using namespace std;
 #define InputDir "Input.txt"   //测试数据文件路径
 
 //AVL树结点（左右链存储结构）
-typedef struct AVLTreeNode
+struct AVLTreeNode
 {
 	DataType key;  //数据
-	int BF;   //平衡因子
+	int height;   //结点所在位置高度
 	AVLTreeNode* leftchild;
 	AVLTreeNode* rightchild;
-}AVLTree;
+	//结点初始化
+	AVLTreeNode()
+	{
+		height = 0;
+		leftchild = rightchild = NULL;
+	}
+};
 
 //相关函数声明
-void AVL_LeftRotation(AVLTree*& T);           //AVL树LL、LR旋转操作函数
-void AVL_RightRotation(AVLTree*& T);          //AVL树RR、RL旋转操作函数
-DataType AVL_GetMin(AVLTree*& T);             //获取AVL树待删除结点左子树的最右结点
-void AVL_Insert(AVLTree*& T, DataType data);  //AVL树插入操作函数
-void AVL_Delete(AVLTree*& T, DataType data);  //AVL树删除操作函数
-void PrintSort(AVLTree*& T);                  //屏幕显示AVL树排序结果
-void PrintAVL(AVLTree*& T);                   //屏幕显示AVL树
+int Get_Height(AVLTreeNode* a);                 //获取结点高度函数
+int Get_Max(AVLTreeNode* a, AVLTreeNode* b);    //比较两结点高度并返回较大值
+DataType Get_MinNode(AVLTreeNode* T);           //获取AVL树待删除结点左子树的最右结点
+AVLTreeNode* RightRotate(AVLTreeNode* a);       //LL情况，右旋转，返回新的根结点指针
+AVLTreeNode* LeftRotate(AVLTreeNode* a);        //RR情况，左旋转，返回新的根结点指针
+AVLTreeNode* Left_RightRotate(AVLTreeNode* a);  //LR情况，先根结点leftchild左旋再根节点右旋，返回新的根结点指针
+AVLTreeNode* Right_LeftRotate(AVLTreeNode* a);  //RL情况，先根结点rightchild右旋再根结点左旋，返回新的根结点指针
+void Insert(AVLTreeNode*& a, DataType x);       //AVL树插入操作函数
+void Delete(AVLTreeNode*& a, DataType x);       //AVL树删除操作函数
+void PrintSort(AVLTreeNode* T);                 //屏幕显示AVL树排序结果
+void PrintAVL(AVLTreeNode*& T);                 //屏幕显示AVL树
 
-//AVL树LL、LR旋转操作函数
-void AVL_LeftRotation(AVLTree*& T)
+//获取结点高度函数
+int Get_Height(AVLTreeNode* a)
 {
-	AVLTreeNode* tmp1;  
-	AVLTreeNode* tmp2;  //保存待调整结点的指针
-	tmp1 = T->leftchild;
-	//LL旋转
-	if (tmp1->BF == 1)
-	{
-		T->leftchild = tmp1->rightchild;
-		tmp1->rightchild = T;
-		T->BF = 0;
-		T = tmp1;
-	}
-	//LR旋转
-	else
-	{
-		tmp2 = tmp1->rightchild;
-		tmp1->rightchild = tmp2->leftchild;
-		tmp2->leftchild = tmp1;
-		T->leftchild = tmp2->rightchild;
-		tmp2->rightchild = T;
-		switch (tmp2->BF)
-		{
-		case 1: {
-			T->BF = -1;
-			tmp1->BF = 0;
-		}
-			  break;
-		case 0: T->BF = tmp1->BF = 0;
-			break;
-		case -1: {
-			T->BF = 0;
-			tmp1->BF = 1;
-		}
-		}
-		T = tmp2;
-	}
-	T->BF = 0;
+	if (!a)
+		return 0;
+	return a->height;
 }
 
-//AVL树RR、RL旋转操作函数
-void AVL_RightRotation(AVLTree*& T)
+//比较两结点高度并返回较大值
+int Get_Max(AVLTreeNode* a, AVLTreeNode* b)
 {
-	AVLTreeNode* tmp1;
-	AVLTreeNode* tmp2;  //保存待调整结点的指针
-	tmp1 = T->rightchild;
-	//RR旋转
-	if (tmp1->BF == 1)
-	{
-		T->rightchild = tmp1->leftchild;
-		tmp1->leftchild = T;
-		T->BF = 0;
-		T = tmp1;
-	}
-	//RL旋转
-	else
-	{
-		tmp2 = tmp1->leftchild;
-		tmp1->leftchild = tmp2->rightchild;
-		tmp2->rightchild = tmp1;
-		T->rightchild = tmp2->leftchild;
-		tmp2->leftchild = T;
-		switch (tmp2->BF)
-		{
-		case -1: {
-			T->BF = -1;
-			tmp1->BF = 0;
-		}
-			  break;
-		case 0: T->BF = tmp1->BF = 0;
-			break;
-		case 1: {
-			T->BF = 0;
-			tmp1->BF = 1;
-		}
-		}
-		T = tmp2;
-	}
-	T->BF = 0;
+	if (Get_Height(a) > Get_Height(b))
+		return Get_Height(a);
+	return Get_Height(b);
 }
 
 //获取AVL树待删除结点左子树的最右结点
-DataType AVL_GetMin(AVLTree*& T)
+DataType Get_MinNode(AVLTreeNode* T)
 {
 	int min = T->key;
-	AVLTree* temp = NULL;
+	AVLTreeNode* temp = NULL;
 	while (T->rightchild)
 	{
 		temp = T;
@@ -130,113 +74,159 @@ DataType AVL_GetMin(AVLTree*& T)
 	return min;
 }
 
-//AVL树插入操作函数
-void AVL_Insert(AVLTree*& T, DataType data)
+//LL情况，右旋转，返回新的根结点指针
+AVLTreeNode* RightRotate(AVLTreeNode* a)
 {
-	//向空树中插入元素
-	if (!T)
+	AVLTreeNode* lc = a->leftchild;
+	a->leftchild = lc->rightchild;
+	lc->rightchild = a;
+	//更新结点高度
+	a->height = Get_Max(a->leftchild, a->rightchild) + 1;
+	lc->height = Get_Max(lc->leftchild, lc->rightchild) + 1;
+	return lc;
+}
+
+//RR情况，左旋转，返回新的根结点指针
+AVLTreeNode* LeftRotate(AVLTreeNode* a)
+{
+	AVLTreeNode* rc = a->rightchild;
+	a->rightchild = rc->leftchild;
+	rc->leftchild = a;
+	//更新结点高度
+	a->height = Get_Max(a->leftchild, a->rightchild) + 1;
+	rc->height = Get_Max(rc->leftchild, rc->rightchild) + 1;
+	return rc;
+}
+
+//LR情况，先根结点leftchild左旋再根节点右旋，返回新的根结点指针
+AVLTreeNode* Left_RightRotate(AVLTreeNode* a)
+{
+	a->leftchild = LeftRotate(a->leftchild);
+	return RightRotate(a);
+}
+
+//RL情况，先根结点rightchild右旋再根结点左旋，返回新的根结点指针
+AVLTreeNode* Right_LeftRotate(AVLTreeNode* a)
+{
+	a->rightchild = RightRotate(a->rightchild);
+	return LeftRotate(a);
+}
+
+//AVL树插入操作函数
+void Insert(AVLTreeNode*& a, DataType x)
+{
+	if (!a)
 	{
-		T = new AVLTreeNode;
-		T->key = data;
-		T->leftchild = NULL;
-		T->rightchild = NULL;
-		T->BF = 0;
+		a = new AVLTreeNode;
+		a->key = x;
 	}
-	//在左子树上插入
-	else if (data < T->key)
+	else if (x < a->key)
 	{
-		AVL_Insert(T->leftchild, data);
-		switch (T->BF)
+		Insert(a->leftchild, x);
+		if (Get_Height(a->leftchild) - Get_Height(a->rightchild) == 2)
 		{
-		case -1:
-			T->BF = 0;
-			break;
-		case 0:
-			T->BF = 1;
-			break;
-		case 1:AVL_LeftRotation(T);
+			if (x < a->leftchild->key)
+			{
+				a = RightRotate(a);      //LL
+				cout << "LL" << endl;
+			}
+			else
+			{
+				a = Left_RightRotate(a); //LR
+				cout << "LR" << endl;
+			}
 		}
 	}
-	//在右子树上插入
-	else if (data > T->key)
+	else if (x > a->key)
 	{
-		AVL_Insert(T->rightchild, data);
-		switch (T->BF)
+		Insert(a->rightchild, x);
+		if (Get_Height(a->rightchild) - Get_Height(a->leftchild) == 2)
 		{
-		case 1:
-			T->BF = 0;
-			break;
-		case 0:T->BF = -1;
-			break;
-		case -1:AVL_RightRotation(T);
+			if (x > a->rightchild->key)
+			{
+				a = LeftRotate(a);       //RR
+				cout << "RR" << endl;
+			}
+			else
+			{
+				a = Right_LeftRotate(a); //RL
+				cout << "RL" << endl;
+			}
 		}
 	}
-	//AVL树中存在此元素，无需插入
 	else
 	{
-		cout << "Data:" << data << " already exists!" << endl;
+		cout << "Data ["<< x << "] "<< "already exists!" << endl;
 		return;
 	}
+	a->height = Get_Max(a->leftchild, a->rightchild) + 1;
 }
 
 //AVL树删除操作函数
-void AVL_Delete(AVLTree*& T, DataType data)
+void Delete(AVLTreeNode*& a, DataType x)
 {
-	AVLTree* tmp;
-	//空树或未找到
-	if (!T)
+	if (!a)
 	{
-		cout << "Data not found, deletion failed!" << endl;
+		cout << "Can not found data [" << x << "]!" << endl;
 		return;
 	}
-	//在左子树上寻找
-	else if (data < T->key)
+	if (x < a->key)
 	{
-		AVL_Delete(T->leftchild, data);
-		switch (T->BF)
+		Delete(a->leftchild, x);
+		if (Get_Height(a->rightchild) - Get_Height(a->leftchild) == 2)
 		{
-		case 1: T->BF = 0;
-			break;
-		case 0:T->BF = -1;
-			break;
-		case -1:AVL_RightRotation(T);
+			if (x < a->rightchild->key)
+			{
+				a = LeftRotate(a);       //RR
+				cout << "RR" << endl;
+			}
+			else
+			{
+				a = Right_LeftRotate(a); //RL
+				cout << "RL" << endl;
+			}
 		}
 	}
-	//在右子树上寻找
-	else if (data > T->key)
+	else if (x > a->key)
 	{
-		AVL_Delete(T->rightchild, data);
-		switch (T->BF)
+		Delete(a->rightchild, x);
+		if (Get_Height(a->leftchild) - Get_Height(a->rightchild) == 2)
 		{
-		case -1:T->BF = 0;
-			break;
-		case 0:T->BF = 1;
-			break;
-		case 1:AVL_LeftRotation(T);
+			if (x > a->leftchild->key)
+			{
+				a = RightRotate(a);      //LL
+				cout << "LL" << endl;
+			}
+			else
+			{
+				a = Left_RightRotate(a); //LR
+				cout << "LR" << endl;
+			}
 		}
 	}
-	//AVL树中存在此元素，进行删除
-	else
+	else if (x == a->key)
 	{
-		tmp = T;
-		if (!T->leftchild)
+		AVLTreeNode* tmp;
+		tmp = a;
+		if (!a->leftchild)
 		{
-			T = T->rightchild;
+			a = a->rightchild;
 			delete tmp;
 		}
-		else if (!T->rightchild)
+		else if (!a->rightchild)
 		{
-			T = T->leftchild;
+			a = a->leftchild;
 			delete tmp;
 		}
 		else
-			T->key = AVL_GetMin(T->leftchild);
+			a->key = Get_MinNode(a->leftchild);
 	}
-	cout << "Deletion complete!" << endl;
+	if (a)
+		a->height = Get_Max(a->leftchild, a->rightchild) + 1;
 }
 
 //屏幕显示AVL树排序结果
-void PrintSort(AVLTree*& T)
+void PrintSort(AVLTreeNode* T)
 {
 	if (T == NULL)
 		return;
@@ -246,15 +236,15 @@ void PrintSort(AVLTree*& T)
 }
 
 //屏幕显示AVL树
-void PrintAVL(AVLTree*& T)
+void PrintAVL(AVLTreeNode*& T)
 {
 	cout << "---------------AVL Tree---------------" << endl;
-	queue<AVLTree*> q;
+	queue<AVLTreeNode*> q;
 	if (!T)
 		return;
 	int curCount = 1;   //记录AVL树当前层在队列中结点个数
 	int levelcount = 1;
-	AVLTree* temp;
+	AVLTreeNode* temp;
 	q.push(T);
 	cout << "Level:" << levelcount << "|";
 	while (!q.empty())
@@ -288,11 +278,12 @@ void PrintAVL(AVLTree*& T)
 
 int main(void)
 {
-	int n;         //记录数据个数
-	DataType tmp;  //暂存数据
+	int n;                  //记录数据个数
+	DataType tmp;           //暂存数据
+	AVLTreeNode* T = NULL;  //保存AVL树根结点指针
 	ifstream Input;
-	AVLTree* T = NULL;
 	Input.open(InputDir);
+	cout << "---------------Initialization---------------" << endl;
 	if (!Input)
 	{
 		cout << "File open failed!" << endl;
@@ -301,6 +292,7 @@ int main(void)
 	}
 	else
 	{
+		//输入重定向至文件
 		streambuf* stream_buffer_cin = cin.rdbuf();
 		streambuf* stream_buffer_file = Input.rdbuf();
 		cin.rdbuf(stream_buffer_file);
@@ -308,7 +300,7 @@ int main(void)
 		for (int i = 1; i <= n; ++i)
 		{
 			cin >> tmp;
-			AVL_Insert(T, tmp);
+			Insert(T, tmp);
 		}
 		Input.close();
 		cin.rdbuf(stream_buffer_cin);
@@ -328,13 +320,15 @@ int main(void)
 		{
 			cout << "Input data to insert:";
 			cin >> tmp;
-			AVL_Insert(T, tmp);
+			Insert(T, tmp);
+			system("pause");
 		}
 		else if (n == 2)
 		{
 			cout << "Input data to delete:";
 			cin >> tmp;
-			AVL_Delete(T, tmp);
+			Delete(T, tmp);
+			system("pause");
 		}
 		else
 		{
