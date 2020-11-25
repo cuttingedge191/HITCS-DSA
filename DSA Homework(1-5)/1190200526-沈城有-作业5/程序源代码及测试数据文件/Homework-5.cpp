@@ -31,7 +31,7 @@ struct AVLTreeNode
 //相关函数声明
 int Get_Height(AVLTreeNode* a);                 //获取结点高度函数
 int Get_Max(AVLTreeNode* a, AVLTreeNode* b);    //比较两结点高度并返回较大值
-DataType Get_MinNode(AVLTreeNode* T);           //获取AVL树待删除结点左子树的最右结点
+DataType Get_MinNode(AVLTreeNode*& T);          //获取AVL树待删除结点左子树的最右结点
 AVLTreeNode* RightRotate(AVLTreeNode* a);       //LL情况，右旋转，返回新的根结点指针
 AVLTreeNode* LeftRotate(AVLTreeNode* a);        //RR情况，左旋转，返回新的根结点指针
 AVLTreeNode* Left_RightRotate(AVLTreeNode* a);  //LR情况，先根结点leftchild左旋再根节点右旋，返回新的根结点指针
@@ -58,20 +58,20 @@ int Get_Max(AVLTreeNode* a, AVLTreeNode* b)
 }
 
 //获取AVL树待删除结点左子树的最右结点
-DataType Get_MinNode(AVLTreeNode* T)
+DataType Get_MinNode(AVLTreeNode*& T)
 {
-	int min = T->key;
-	AVLTreeNode* temp = NULL;
-	while (T->rightchild)
+	DataType min;
+	AVLTreeNode* p;
+	if (!T->rightchild)
 	{
-		temp = T;
-		T = T->rightchild;
+		p = T;
+		min = T->key;
+		T = T->leftchild;  //左链继承
+		delete p;
+		return min;
 	}
-	min = T->key;
-	if (temp)
-		temp->rightchild = NULL;
-	delete T;
-	return min;
+	else
+		return (Get_MinNode(T->rightchild));
 }
 
 //LL情况，右旋转，返回新的根结点指针
